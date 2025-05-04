@@ -78,4 +78,25 @@ describe('PDA CRUD program', () => {
     expect(messageAccount.bump).equal(messageBump);
     expect(messageAccount.message).equal(newMessage);
   });
+
+  it('Should delete Message Account', async () => {
+    const transactionSignature = await program.methods
+      .delete(uniqueId)
+      .accounts({
+        messageAccount: messagePda, // do we need this? (types are not generated correctly)
+      } as any)
+      .rpc({ commitment: 'confirmed' });
+
+    const messageAccount = await program.account.messageAccount.fetchNullable(
+      messagePda,
+      'confirmed',
+    );
+
+    console.log(
+      'Transaction Signature:',
+      makeTxExplorerUrl(transactionSignature),
+    );
+
+    expect(messageAccount).equal(null);
+  });
 });

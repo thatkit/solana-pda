@@ -34,7 +34,8 @@ pub mod solana_pda {
         Ok(())
     }
 
-    pub fn delete(_ctx: Context<Delete>) -> Result<()> {
+    pub fn delete(_ctx: Context<Delete>, _pda_id: u32) -> Result<()> {
+        msg!("Delete Message");
         Ok(())
     }
 }
@@ -91,7 +92,23 @@ pub struct Update<'info> {
 }
 
 #[derive(Accounts)]
-pub struct Delete {}
+#[instruction(pda_id: u32)]
+pub struct Delete<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"message",
+            &pda_id.to_string().as_bytes(),
+            user.key().as_ref(),
+        ],
+        bump = message_account.bump,
+        close = user,
+    )]
+    pub message_account: Account<'info, MessageAccount>,
+}
 
 #[account]
 pub struct MessageAccount {
