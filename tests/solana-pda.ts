@@ -32,6 +32,16 @@ describe('PDA CRUD program', () => {
     bump: messageBump,
   });
 
+  const [vaultPda, vaultBump] = PublicKey.findProgramAddressSync(
+    [Buffer.from('vault'), provider.wallet.publicKey.toBuffer()],
+    program.programId,
+  );
+
+  console.log('Expected Vault PDA:', {
+    address: vaultPda.toString(),
+    bump: vaultBump,
+  });
+
   it('Should create Message Account', async () => {
     const message = 'Hello!!!';
     const transactionSignature = await program.methods
@@ -61,6 +71,7 @@ describe('PDA CRUD program', () => {
       .update(newMessage, uniqueId)
       .accounts({
         messageAccount: messagePda, // do we need this? (types are not generated correctly)
+        vaultAccount: vaultPda,
       } as any)
       .rpc({ commitment: 'confirmed' });
 
@@ -84,6 +95,7 @@ describe('PDA CRUD program', () => {
       .delete(uniqueId)
       .accounts({
         messageAccount: messagePda, // do we need this? (types are not generated correctly)
+        vaultAccount: vaultPda,
       } as any)
       .rpc({ commitment: 'confirmed' });
 
